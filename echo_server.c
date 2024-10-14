@@ -11,13 +11,17 @@
 void error_handling(char *message);
 void reverse_message(char *message, int str_len, char * reversed_message);
 
+struct log{
+    char *clnt_ip;
+    char *time_str;
+};
 
 int main(int argc, char *argv[])
 {
     int serv_sock, clnt_sock;
     char message[BUF_SIZE]; // 받은 메세지 저장
     int str_len, i;
-	int logCount = 0
+	int logCount = 0;
     
     struct sockaddr_in serv_adr;
     struct sockaddr_in clnt_adr;
@@ -55,24 +59,24 @@ int main(int argc, char *argv[])
 		struct tm *tm_info = localtime(&t); // 지역 시간으로 변환
         char time_str[20];
 		strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info); // 시간 포맷팅, 인터넷 참고
-
       	printf("Connected client IP: %s  Time: %s \n", clnt_ip, time_str);
+
+        // 로그 저장
+        struct log[MAX_LOG_SIZE] logs;
+        logs[logCount].clnt_ip = clnt_ip;
+        logs[logCount].time_str = time_str;
+        logCount++;
       	
 	}    
         while((str_len = read(clnt_sock, message, BUF_SIZE - 1)) > 0)
         {
-	    // printf("%d---- \n",str_len); 
-          
-
+	        // printf("%d---- \n",str_len); 
             // 메시지를 역순으로 변환
             char reversed_message[BUF_SIZE];
 			reverse_message(message, str_len, reversed_message);
-            
-
             // 클라이언트에게 역순 메시지 전송
             write(clnt_sock, reversed_message, str_len);
         }
-
         close(clnt_sock);
     }
 
@@ -83,9 +87,7 @@ int main(int argc, char *argv[])
 void reverse_message(char *message, int str_len, char * reversed_message)
 {
 	for(int i = 0; i < str_len-1; i++)
-    {
     	reversed_message[i] = message[str_len - i -2];
-    }
     reversed_message[str_len-1] = '\n'; // 개행 문자 추가
 }
 
